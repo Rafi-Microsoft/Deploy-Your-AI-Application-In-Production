@@ -78,6 +78,21 @@ hooks:
       shell: pwsh
       continueOnError: true
     
+    # Stage 7.6: Create Fabric private DNS zones in resource group + link to VNet
+    # (Idempotent; no-op when virtual network is not deployed.)
+    - run: ./scripts/automationScripts/FabricWorkspace/SecureWorkspace/create_fabric_private_dns_zones.ps1
+      interactive: false
+      shell: pwsh
+      continueOnError: true
+
+    # Stage 7.7: Deploy workspace-level Fabric private link service +
+    # VNet private endpoint (Microsoft.Fabric/privateLinkServicesForFabric@2024-06-01).
+    # Gated by FABRIC_ENABLE_WORKSPACE_PRIVATE_ENDPOINT=true.
+    - run: ./scripts/automationScripts/FabricWorkspace/SecureWorkspace/deploy_fabric_workspace_private_endpoint.ps1
+      interactive: false
+      shell: pwsh
+      continueOnError: false
+
     # Stage 8: Setup Fabric Workspace Private Link (for VNet integration)
     - run: ./scripts/automationScripts/FabricWorkspace/SecureWorkspace/setup_fabric_private_link.ps1
       interactive: false

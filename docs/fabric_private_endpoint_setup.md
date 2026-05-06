@@ -2,7 +2,18 @@
 
 ## Overview
 
-This guide explains how to configure private access to Microsoft Fabric workspaces from Azure VNet resources (e.g., Jump VM). **Fabric workspace private endpoints are currently service-managed and not deployable via ARM/Bicep/CLI**; customer automation cannot create or poll a `Microsoft.Fabric/privateLinkServicesForFabric` resource. Use the manual steps to enable workspace-level private link in the Fabric portal.
+This guide explains how to configure private access to Microsoft Fabric workspaces from Azure VNet resources (e.g., Jump VM).
+
+> **Update (2024-06+):** Fabric workspace private endpoints are now **fully ARM/Bicep deployable** via the new `Microsoft.Fabric/privateLinkServicesForFabric@2024-06-01` resource provider. The accelerator now automates this end-to-end via:
+> - `infra/fabric-workspace-private-link.bicep` (wrapper template)
+> - `scripts/automationScripts/FabricWorkspace/SecureWorkspace/deploy_fabric_workspace_private_endpoint.ps1` (post-provision hook, Stage 7.7)
+>
+> References:
+> - https://learn.microsoft.com/fabric/security/security-workspace-level-private-links-set-up
+> - https://learn.microsoft.com/azure/templates/microsoft.fabric/privatelinkservicesforfabric
+> - https://learn.microsoft.com/azure/search/search-indexer-howto-access-private (workspace shared private link)
+>
+> One-time prerequisite: register the `Microsoft.Fabric` resource provider in the target subscription (the postprovision script does this automatically).
 
 ## Architecture
 

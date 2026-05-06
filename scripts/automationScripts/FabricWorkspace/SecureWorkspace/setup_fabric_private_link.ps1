@@ -280,8 +280,20 @@ try {
     if ($LASTEXITCODE -ne 0) {
       $resultText = $createResult | Out-String
       if ($resultText -match "Cannot create private endpoint for requested type 'workspace'") {
-        Warn "Azure AI Search does not yet support shared private links targeting Microsoft Fabric workspaces."
-        Warn "Continuing without the Fabric shared private link; OneLake indexers must use public networking or be updated once support is available."
+        # Historical fallback (pre-2024-06): Azure AI Search did not support
+        # shared private links to Fabric workspaces. The platform now supports
+        # group-id='workspace' against Microsoft.Fabric/privateLinkServicesForFabric.
+        # If this branch is hit today, the workspace-level Fabric private link
+        # service has not been created yet - run deploy_fabric_workspace_private_endpoint.ps1
+        # first (Stage 7.7 in azure.yaml), or check Microsoft.Fabric provider registration.
+        # Refs:
+        #   https://learn.microsoft.com/azure/search/search-indexer-howto-access-private
+        #   https://learn.microsoft.com/fabric/security/security-workspace-level-private-links-set-up
+        Warn "Shared private link creation failed with the legacy 'unsupported workspace' error."
+        Warn "Verify that:"
+        Warn "  1. deploy_fabric_workspace_private_endpoint.ps1 ran successfully (creates Microsoft.Fabric/privateLinkServicesForFabric)."
+        Warn "  2. Microsoft.Fabric resource provider is registered in subscription $subscriptionId."
+        Warn "  3. Workspace-level private link is enabled in the Fabric portal."
         $sharedLinkUnsupported = $true
       } else {
         Fail "Failed to create shared private link. Details: $resultText"
